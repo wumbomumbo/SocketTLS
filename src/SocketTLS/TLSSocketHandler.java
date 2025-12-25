@@ -123,9 +123,34 @@ final class TLSSocketHandler {
             sc.close();
 
             String response = resp.toString();
+            boolean isChunked = response.toLowerCase().indexOf("transfer-encoding: chunked") != -1;
+            String headers = "";
             
-            if (stripHeaders) {
+            int headerEnd = response.indexOf("\r\n\r\n");
+            if (headerEnd != -1) {
+                headers = response.substring(0, headerEnd + 4);
+            } else {
+                headerEnd = response.indexOf("\n\n");
+                if (headerEnd != -1) {
+                    headers = response.substring(0, headerEnd + 2);
+                }
+            }
+            
+            // decoding chunked in wrong scenario will fuck things up
+
+            if (isChunked) {
                 response = stripHttpHeaders(response);
+                try {
+                    response = decodeChunkedEncoding(response);
+                } catch (Exception e) {
+                    // if fails, might as well return what we have
+                }
+            } else if (stripHeaders) {
+                response = stripHttpHeaders(response);
+            }
+            
+            if (!stripHeaders && isChunked) {
+                response = headers + response;
             }
             
             return response;
@@ -580,14 +605,58 @@ final class TLSSocketHandler {
     private static String stripHttpHeaders(String response) {
         int headerEnd = response.indexOf("\r\n\r\n");
         if (headerEnd != -1) {
-            return response.substring(headerEnd + 4);
-        }
-        
-        headerEnd = response.indexOf("\n\n");
-        if (headerEnd != -1) {
-            return response.substring(headerEnd + 2);
+            response = response.substring(headerEnd + 4);
+        } else {
+            headerEnd = response.indexOf("\n\n");
+            if (headerEnd != -1) {
+                response = response.substring(headerEnd + 2);
+            }
         }
         
         return response;
+    }
+    
+    private static String decodeChunkedEncoding(String body) throws IOException {
+        StringBuffer result = new StringBuffer();
+        int pos = 0;
+        
+        while (pos < body.length()) {
+            int crlfPos = body.indexOf("\r\n", pos);
+            if (crlfPos == -1) crlfPos = body.indexOf("\n", pos);
+            if (crlfPos == -1) break;
+            
+            String sizeLine = body.substring(pos, crlfPos).trim();
+            if (sizeLine.length() == 0) {
+                pos = crlfPos + 2;
+                continue;
+            }
+            
+            int semiColon = sizeLine.indexOf(';');
+            String hex = (semiColon >= 0) ? sizeLine.substring(0, semiColon) : sizeLine;
+            hex = hex.trim();
+            
+            try {
+                long chunkSize = Long.parseLong(hex, 16);
+                if (chunkSize == 0) break;
+                
+                pos = crlfPos + (body.charAt(crlfPos) == '\r' ? 2 : 1);
+                if (pos + chunkSize <= body.length()) {
+                    result.append(body.substring(pos, (int)(pos + chunkSize)));
+                    pos += chunkSize;
+                    
+                    if (pos < body.length() && body.charAt(pos) == '\r') {
+                        pos += 2;
+                    } else if (pos < body.length() && body.charAt(pos) == '\n') {
+                        pos += 1;
+                    }
+                } else {
+                    break;
+                }
+            } catch (NumberFormatException e) {
+                break;
+            }
+        }
+        
+        return result.toString();
     }
 }
