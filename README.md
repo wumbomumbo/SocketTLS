@@ -89,4 +89,4 @@ ConnectionInterface.connectWebSocket(
 
 ### Credits
 
-Feel free to use and modify this library as per the MIT License. Though credit would be appreciated :)
+Feel free to use and modify this library as per the MIT License. Credit would be appreciated :)
