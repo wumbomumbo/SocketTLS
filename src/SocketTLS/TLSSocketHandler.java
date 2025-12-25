@@ -38,6 +38,7 @@ final class TLSSocketHandler {
 
     public static String userAgent = "BlackBerry-TLS-Client/1.0";
     public static String networkInterface = "wifi";
+    public static boolean stripHeaders = true;
     
     // look at connectioninterface for reference, similar usage
     static String httpRequest(
@@ -121,7 +122,13 @@ final class TLSSocketHandler {
             protocol.close();
             sc.close();
 
-            return resp.toString();
+            String response = resp.toString();
+            
+            if (stripHeaders) {
+                response = stripHttpHeaders(response);
+            }
+            
+            return response;
 
         } catch (Exception e) {
             if (protocol != null) {
@@ -568,5 +575,19 @@ final class TLSSocketHandler {
         }
         
         return connStr;
+    }
+    
+    private static String stripHttpHeaders(String response) {
+        int headerEnd = response.indexOf("\r\n\r\n");
+        if (headerEnd != -1) {
+            return response.substring(headerEnd + 4);
+        }
+        
+        headerEnd = response.indexOf("\n\n");
+        if (headerEnd != -1) {
+            return response.substring(headerEnd + 2);
+        }
+        
+        return response;
     }
 }

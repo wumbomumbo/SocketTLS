@@ -22,6 +22,7 @@ public final class ConnectionInterface {
      // self explanatory
 
      // btw for wifi and data usage, set via TLSSocketHandler.networkInterface as "wifi" or "data"
+     // headers are stripped by default, set TLSSocketHandler.stripHeaders to false to disable that
 
     public static void request(
         final String method,
