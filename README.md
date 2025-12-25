@@ -22,7 +22,7 @@ You'll want to install the [BlackBerry Eclipse Plugin](https://archive.org/downl
 
 I won't go into detail on setting up everything with Eclipse, any issues you encounter you can probably fix with some googling.
 
-Building SocketTLS should be simple as including it as a library within your project, or packaging SocketTLS, which should output a JAR file that you can use.
+Building SocketTLS should be simple as including it as a library within your project, you could also try using a packaged JAR from release, but it seems port 443 gets blocked doing that, so you should get it compiled as a COD in your app.
 
 You may have issues with Eclipse running out of memory upon building SocketTLS, you may need to increase the default memory settings.
 
