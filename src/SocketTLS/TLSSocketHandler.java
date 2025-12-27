@@ -119,7 +119,7 @@ public final class TLSSocketHandler {
             } catch (IOException e) {
                 // hack, just makes it seem less bad and wont take the whole thing down
                 if (TLSConstants.DebugMode) {
-                    System.out.println("DEBUG: Read finished (socket closed)");
+                    System.out.println("DEBUG: Read finished (socket closed), but incase bad: " + e.toString());
                 }
             }
 
