@@ -18,7 +18,7 @@ This library is built on top of the legacy BouncyCastle J2ME API, which has been
 
 The build process is pretty simple, in this guide we'll be going over the way I do it.
 
-You'll want to install the [BlackBerry Eclipse Plugin](https://archive.org/download/java-for-blackberryos/Eclipse%20Plug-in/). The installer will automatically install the correct version of Eclipse for your system, you will also want to install JDK 1.5 32-Bit.
+You'll want to install the [BlackBerry Eclipse Plugin](https://archive.org/download/java-for-blackberryos/Eclipse%20Plug-in/). The installer will automatically install the correct version of Eclipse for your system, you will also want to install JDK 1.6 32-Bit.
 
 I won't go into detail on setting up everything with Eclipse, any issues you encounter you can probably fix with some googling.
 
