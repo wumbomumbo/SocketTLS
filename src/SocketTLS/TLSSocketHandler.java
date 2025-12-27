@@ -32,7 +32,7 @@ import bcjavastub.security.SecureRandom;
 
 // handler for connection via TLS, please use ConnectionHandler for easier access
 
-final class TLSSocketHandler {
+public final class TLSSocketHandler {
     
     // default user agent, can be changed if needed
 
@@ -87,8 +87,12 @@ final class TLSSocketHandler {
             }
             
             if (data != null && data.length() > 0) {
-                req.append("Content-Length: ").append(data.length()).append("\r\n");
-                req.append("Content-Type: application/x-www-form-urlencoded\r\n");
+                if (req.toString().indexOf("Content-Length:") == -1) {
+                    req.append("Content-Length: ").append(data.length()).append("\r\n");
+                }
+                if (req.toString().indexOf("Content-Type:") == -1) {
+                    req.append("Content-Type: application/x-www-form-urlencoded\r\n");
+                }
             }
             
             req.append("Connection: close\r\n");
